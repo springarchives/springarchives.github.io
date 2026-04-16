@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>시선, 장면, 기록 — 각자의 봄이 머문 순간들</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #111111;
+  --dark-gray: #333333;
+  --gray: #888888;
+  --light-gray: #f5f5f5;
+  --white: #ffffff;
+  --accent: #cdff00; /* 트렌디한 스프링 라임 */
+  --font: 'Noto Sans KR', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: #e9ecef; /* PC 바탕화면 색상 */
+  display: flex;
+  justify-content: center;
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── APP WRAPPER (모바일 사이즈 고정) ── */
+#app-wrapper {
+  width: 100%;
+  max-width: 480px;
+  min-height: 100svh;
+  background-color: var(--white);
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow-x: hidden;
+  color: var(--black);
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  max-width: 480px;
+  z-index: 100;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #eee;
+}
+.nav-logo {
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.nav-badge {
+  background: var(--black);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+/* ── HERO & INFO COMBINED (첫 페이지 압축) ── */
+.hero {
+  padding: 100px 24px 60px; /* 높이를 강제하지 않고 패딩으로 조절 */
+  background: var(--light-gray);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 5%; right: -15%;
+  width: 250px; height: 250px;
+  background: var(--accent);
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.6;
+  z-index: 0;
+}
+.hero-content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+}
+.hero-tag {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--dark-gray);
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--black);
+  padding-bottom: 4px;
+}
+.hero-title {
+  font-size: 40px;
+  font-weight: 900;
+  line-height: 1.25;
+  margin-bottom: 16px;
+  word-break: keep-all;
+  letter-spacing: -0.02em;
+}
+.hero-title span {
+  color: var(--gray);
+  font-weight: 300;
+}
+.hero-subtitle {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--dark-gray);
+  line-height: 1.6;
+  word-break: keep-all;
+  margin-bottom: 40px; /* 티켓 박스와의 간격 */
+}
+
+/* 첫 페이지에 포함된 티켓 박스 */
+.ticket-box {
+  border: 2px solid var(--black);
+  padding: 24px 20px;
+  position: relative;
+  background: var(--white);
+  text-align: left;
+  margin: 0 auto;
+  width: 100%;
+}
+.ticket-box::before, .ticket-box::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 12px; height: 24px;
+  background: var(--light-gray); /* 배경색에 맞춰 뚫린 효과 */
+  border: 2px solid var(--black);
+  transform: translateY(-50%);
+}
+.ticket-box::before {
+  left: -2px;
+  border-radius: 0 30px 30px 0;
+  border-left: none;
+}
+.ticket-box::after {
+  right: -2px;
+  border-radius: 30px 0 0 30px;
+  border-right: none;
+}
+.info-row {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid #eee;
+  padding: 12px 0;
+}
+.info-row:first-child { padding-top: 0; }
+.info-row:last-child { border-bottom: none; padding-bottom: 0; }
+.info-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gray);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+  letter-spacing: 0.1em;
+}
+.info-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--black);
+  word-break: keep-all;
+}
+.info-value span {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray);
+  margin-left: 4px;
+}
+
+/* ── STAMP TOUR ── */
+.stamp-section {
+  padding: 80px 24px;
+  background: var(--black);
+  color: var(--white);
+  text-align: center;
+}
+.stamp-title {
+  font-size: 24px;
+  font-weight: 900;
+  margin-bottom: 12px;
+}
+.stamp-title span { color: var(--accent); }
+.stamp-desc {
+  font-size: 14px;
+  color: #aaa;
+  margin-bottom: 40px;
+  word-break: keep-all;
+  line-height: 1.6;
+}
+.stamp-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.stamp-box {
+  background: var(--dark-gray);
+  aspect-ratio: 1/1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.3s;
+}
+.stamp-box.stamped {
+  background: var(--accent);
+  color: var(--black);
+}
+.stamp-floor {
+  font-size: 16px;
+  font-weight: 900;
+  opacity: 0.5;
+}
+.stamp-box.stamped .stamp-floor { opacity: 1; }
+.stamp-check {
+  display: none;
+  font-size: 28px;
+  margin-top: 5px;
+}
+.stamp-box.stamped .stamp-check {
+  display: block;
+  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes popIn {
+  0% { transform: scale(0); }
+  100% { transform: scale(1); }
+}
+.stamp-reward-msg {
+  display: none;
+  margin-top: 30px;
+  padding: 20px;
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.stamp-reward-msg.active { display: block; }
+
+/* ── ARTISTS SECTION ── */
+.artists-section {
+  padding: 80px 24px;
+  background: var(--white); /* 영롱하게 화이트로 변경 */
+}
+.section-title-wrap {
+  margin-bottom: 40px;
+}
+.artists-header {
+  font-size: 28px;
+  font-weight: 900;
+}
+.artists-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.artist-card {
+  background: var(--light-gray);
+  padding: 20px 16px;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.artist-card:active {
+  background: #e0e0e0;
+}
+.artist-card:hover {
+  border-color: var(--black);
+  background: var(--black);
+  color: var(--white);
+}
+.artist-card:hover .artist-genre { color: var(--accent); }
+.artist-card:hover .artist-floor-tag { background: var(--accent); color: var(--black); }
+
+.artist-floor-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 900;
+  background: var(--white);
+  color: var(--gray);
+  padding: 4px 8px;
+  margin-bottom: 12px;
+  transition: all 0.2s;
+  border: 1px solid #eee;
+}
+.artist-card:hover .artist-floor-tag { border-color: transparent; }
+
+.artist-name {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.artist-genre {
+  font-size: 12px;
+  color: var(--gray);
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+  z-index: 1000;
+  display: none;
+  overflow-y: auto;
+  padding: 20px;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.active { display: flex; }
+.modal-close {
+  position: absolute;
+  top: 15px; right: 15px;
+  background: none; border: none; font-size: 36px; cursor: pointer; color: var(--white);
+  z-index: 1001;
+  font-weight: 300;
+}
+.modal-content {
+  background: var(--white);
+  width: 100%;
+  max-width: 400px;
+  padding: 30px 24px;
+  position: relative;
+}
+.modal-artwork {
+  width: 100%;
+  aspect-ratio: 1/1;
+  background: #eee;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.modal-name { font-size: 24px; font-weight: 900; margin-bottom: 4px; }
+.modal-insta {
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--black);
+  text-decoration: underline;
+  margin-bottom: 16px;
+}
+.modal-bio {
+  font-size: 14px;
+  color: var(--dark-gray);
+  line-height: 1.7;
+  word-break: keep-all;
+}
+
+/* ── FOOTER ── */
+footer {
+  padding: 50px 24px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gray);
+  background: var(--light-gray);
+  text-transform: uppercase;
+  line-height: 1.8;
+}
+
+/* ── SPRING PETAL ANIMATION ── */
+.petals-container {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.petal {
+  position: absolute;
+  background: var(--accent);
+  border-radius: 150% 0 150% 0;
+  opacity: 0.3;
+  animation: fall linear infinite;
+}
+@keyframes fall {
+  0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.5; }
+  90% { opacity: 0.5; }
+  100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+}
+
+@media (max-width: 480px) {
+  .hero { padding: 90px 20px 50px; }
+  .stamp-section, .artists-section { padding: 60px 20px; }
+  .artists-grid { gap: 10px; }
+  .artist-card { padding: 16px 12px; }
+}
+</style>
+</head>
+<body>
+
+<div id="app-wrapper">
+
+  <nav>
+    <div class="nav-logo">Exhibition</div>
+    <div class="nav-badge">2026 POP-UP</div>
+  </nav>
+
+  <section class="hero">
+    <div class="petals-container" id="petals"></div>
+    <div class="hero-content">
+      <div class="hero-tag">시선, 장면, 기록</div>
+      <h1 class="hero-title">각자의 봄이<br>머문 순간들<span>.</span></h1>
+      <p class="hero-subtitle">20명의 아티스트가 기록한<br>다채로운 시선의 조각들</p>
+      
+      <div class="ticket-box">
+        <div class="info-row">
+          <div class="info-label">Date</div>
+          <div class="info-value">2026. 5. 5(화) ~ 5. 19(화)</div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">Time</div>
+          <div class="info-value">11:00 ~ 20:00 <span>(입장 마감 19:30)</span></div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">Location</div>
+          <div class="info-value">서울도시제조허브 1F – 6F</div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">Ticket</div>
+          <div class="info-value">무료 관람 (Free)</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="stamp-section">
+    <h2 class="stamp-title">STAMP <span>TOUR</span></h2>
+    <p class="stamp-desc">각 층에 숨겨진 QR을 스캔하여 6개의 스탬프를 모두 모아주세요.<br>스페셜 굿즈를 선물로 드립니다.</p>
+    
+    <div class="stamp-grid">
+      <div class="stamp-box" id="stamp1">
+        <div class="stamp-floor">1F</div>
+        <div class="stamp-check">✔</div>
+      </div>
+      <div class="stamp-box" id="stamp2">
+        <div class="stamp-floor">2F</div>
+        <div class="stamp-check">✔</div>
+      </div>
+      <div class="stamp-box" id="stamp3">
+        <div class="stamp-floor">3F</div>
+        <div class="stamp-check">✔</div>
+      </div>
+      <div class="stamp-box" id="stamp4">
+        <div class="stamp-floor">4F</div>
+        <div class="stamp-check">✔</div>
+      </div>
+      <div class="stamp-box" id="stamp5">
+        <div class="stamp-floor">5F</div>
+        <div class="stamp-check">✔</div>
+      </div>
+      <div class="stamp-box" id="stamp6">
+        <div class="stamp-floor">6F</div>
+        <div class="stamp-check">✔</div>
+      </div>
+    </div>
+
+    <div class="stamp-reward-msg" id="rewardMsg">
+      MISSION CLEAR!<br>1층 데스크에서 굿즈를 수령하세요.
+    </div>
+  </section>
+
+  <section class="artists-section">
+    <div class="section-title-wrap">
+      <h2 class="artists-header">ARTISTS</h2>
+    </div>
+    <div class="artists-grid" id="artistsGrid">
+      </div>
+  </section>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="modal-content">
+      <div class="modal-artwork" id="modalArtwork"></div>
+      <div class="modal-header">
+        <h3 class="modal-name" id="modalName">Artist Name</h3>
+        <a href="#" class="modal-insta" id="modalInsta" target="_blank">@instagram</a>
+        <p class="modal-bio" id="modalBio">Bio here</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2026 POP-UP EXHIBITION.<br>ALL RIGHTS RESERVED.</p>
+  </footer>
+
+</div>
+
+<script>
+const artists = [
+  { floor: '1F', name: '하슈', genre: '일러스트', insta: 'hasyu_story', bio: '어른이를 위한 다정한 동화를 그립니다! 고래, 북숭이, 솜토의 모험을 그려요.' },
+  { floor: '1F', name: '팻두', genre: '일러스트', insta: 'fatdoostory', bio: '음악 미술 아트토이 등 활동. 캐릭터들이 살아움직이는 스토리텔링 그림.' },
+  { floor: '1F', name: '쪼야', genre: '일러스트', insta: 'zzoya', bio: '몽글몽글하고 따뜻한 그림을 그리고 있는 작가 쪼야입니다. 구름처럼 변하는 마음을 그립니다.' },
+  { floor: '1F', name: '그림0단계', genre: '캐릭터/만화', insta: 'ssshhh2025_10', bio: '시시하고 귀여운 장면을 좋아하고 그리고 있어요.' },
+  
+  { floor: '2F', name: '도우', genre: '캐릭터/만화', insta: 'chapcong_toon', bio: '친구끼리동거+고양이 집사툰 으로 인스타툰 그리고 있는 작가 도우.' },
+  { floor: '2F', name: '하소녹', genre: '일러스트', insta: 'hasonocc', bio: '애 보다가 겨우 짬나면 그림 그리는 하소녹입니다. 웃긴 그림이나 커피 그림 위주로 그리고 있어요.' },
+  { floor: '2F', name: '미아', genre: '캐릭터/만화', insta: 'mimi_u', bio: '문구 브랜드 "MimiU", 반려묘 고양이 "미유님" 캐릭터와 디저트를 수채화 색연필 디지털 작업 합니다.' },
+  { floor: '2F', name: '해란', genre: '일러스트', insta: 'hihi_toon', bio: '세밀한 선화, 꽃, 달, 소녀들, 고요한 감정.' },
+  
+  { floor: '3F', name: '클립트', genre: '캘리그라피', insta: 'clipt_letter', bio: '캘리그라피, 한글 레터링하는 김리하(클립트). 글씨에도 힘이 있다는 걸 보여주는 작가.' },
+  { floor: '3F', name: '쏘드', genre: '공예', insta: 'thodland666', bio: '크리쳐를 주로 만드는 미니어쳐 피규어 조형 작가 쏘드.' },
+  { floor: '3F', name: '체리크라프트', genre: '공예', insta: 'cherry_craft_official', bio: '창작의 즐거움을 선물하는 비즈공예 브랜드 체리크라프트.' },
+  
+  { floor: '4F', name: '연하리', genre: '회화', insta: 'hari_yeon_', bio: '따듯하고 몽글몽글한 그림들.' },
+  { floor: '4F', name: '우혜승', genre: '회화', insta: 'p_art.dreaming', bio: '푸른 우울, 풍경 회화 작업.' },
+  { floor: '4F', name: '박현순', genre: '회화', insta: 'hyunsoon_portfolio', bio: '한국화가 박현순 (중견작가).' },
+  
+  { floor: '5F', name: '송별이', genre: '일러스트', insta: 'song_star1230', bio: '동화 같이 아이의 시선으로 보는 그림.' },
+  { floor: '5F', name: '릴로', genre: '회화', insta: 'lillo_doodle', bio: '바다와 하늘의 경계를 여행하는 고양이를 통해 푸른 휴식을 그리는 회화 작가 릴로입니다!' },
+  { floor: '5F', name: '렌', genre: '일러스트', insta: 'lenstk', bio: '달리면서, 여행하면서 봤던 따듯한 풍경들.' },
+  
+  { floor: '6F', name: '임금손', genre: '공예', insta: 'imhandzoo', bio: '뜨개하는 임금손입니다! 주로 코바늘 작업 하고있고, 손으로 하는건 뭐든 좋아해요.' },
+  { floor: '6F', name: '프몽', genre: '일러스트', insta: 'p_mong', bio: '유쾌한 색감과 패턴으로 일상을 밝히는 일러스트. 긍정적인 봄의 에너지를 전합니다.' },
+  { floor: '6F', name: '나솔', genre: '일러스트', insta: 'nasol_art', bio: '솔직하고 감각적인 드로잉. 수채화로 맑게 퍼지는 봄의 기억들을 담아냅니다.' }
+];
+
+const grid = document.getElementById('artistsGrid');
+artists.forEach((a) => {
+  const card = document.createElement('div');
+  card.className = 'artist-card';
+  card.innerHTML = `
+    <div class="artist-floor-tag">${a.floor}</div>
+    <div class="artist-name">${a.name}</div>
+    <div class="artist-genre">${a.genre}</div>
+  `;
+  card.onclick = () => openModal(a);
+  grid.appendChild(card);
+});
+
+function openModal(artist) {
+  document.getElementById('modalName').innerText = artist.name;
+  document.getElementById('modalInsta').innerText = `@${artist.insta}`;
+  document.getElementById('modalInsta').href = `https://instagram.com/${artist.insta}`;
+  document.getElementById('modalBio').innerText = artist.bio;
+  
+  const artwork = document.getElementById('modalArtwork');
+  artwork.innerHTML = `<span style="font-size:12px; color:#aaa;">[ ${artist.name} 작품 이미지 ]</span>`;
+  
+  document.getElementById('modalOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+function initStampTour() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const getStamp = urlParams.get('stamp');
+
+  let myStamps = JSON.parse(localStorage.getItem('springArchivesStamps')) || { 
+    f1: false, f2: false, f3: false, f4: false, f5: false, f6: false 
+  };
+
+  let newlyStamped = false;
+  
+  if (getStamp >= 1 && getStamp <= 6) {
+    if (!myStamps['f' + getStamp]) {
+      myStamps['f' + getStamp] = true;
+      newlyStamped = true;
+      alert(`🎉 ${getStamp}층 스탬프 인증 완료!`);
+    }
+  }
+
+  if (newlyStamped) {
+    localStorage.setItem('springArchivesStamps', JSON.stringify(myStamps));
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+
+  for (let i = 1; i <= 6; i++) {
+    if (myStamps['f' + i]) {
+      document.getElementById('stamp' + i).classList.add('stamped');
+    }
+  }
+
+  if (myStamps.f1 && myStamps.f2 && myStamps.f3 && myStamps.f4 && myStamps.f5 && myStamps.f6) {
+    document.getElementById('rewardMsg').classList.add('active');
+  }
+}
+
+initStampTour();
+
+function createPetals() {
+  const container = document.getElementById('petals');
+  for (let i = 0; i < 20; i++) {
+    const petal = document.createElement('div');
+    petal.className = 'petal';
+    const size = Math.random() * 8 + 8 + 'px';
+    petal.style.width = size;
+    petal.style.height = size;
+    petal.style.left = Math.random() * 100 + 'vw';
+    petal.style.animationDuration = Math.random() * 6 + 4 + 's';
+    petal.style.animationDelay = Math.random() * 5 + 's';
+    container.appendChild(petal);
+  }
+}
+createPetals();
+</script>
+</body>
+</html>
